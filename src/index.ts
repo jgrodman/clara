@@ -1,12 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 
 import routes from './routes';
-
-// Configure environment variables
-dotenv.config();
 
 // Initialize express app
 const app = express();
