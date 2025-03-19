@@ -18,29 +18,11 @@ if (process.env.GOOGLE_CLOUD_CREDENTIALS) {
   client = new textToSpeech.TextToSpeechClient();
 }
 
-type GCPVoiceNames = 'en-US-Standard-A' | 'en-US-Standard-B' | 'en-US-Standard-C' | 'en-US-Standard-D' | 'en-US-Standard-E' | 
-                     'en-US-Standard-F' | 'en-US-Standard-G' | 'en-US-Standard-H' | 'en-US-Standard-I' | 'en-US-Standard-J' |
-                     'en-US-Neural2-A' | 'en-US-Neural2-C' | 'en-US-Neural2-D' | 'en-US-Neural2-E' | 'en-US-Neural2-F' | 
-                     'en-US-Neural2-G' | 'en-US-Neural2-H' | 'en-US-Neural2-I' | 'en-US-Neural2-J';
-
-const voiceMapping: Record<string, GCPVoiceNames> = {
-  'alloy': 'en-US-Neural2-A',
-  'echo': 'en-US-Neural2-C',
-  'fable': 'en-US-Neural2-F',
-  'onyx': 'en-US-Neural2-D',
-  'nova': 'en-US-Neural2-G',
-  'shimmer': 'en-US-Neural2-H',
-  'ash': 'en-US-Neural2-J',
-  'coral': 'en-US-Neural2-E',
-  'sage': 'en-US-Neural2-I'
-};
 
 export const generateSpeech = async (req: Request, res: Response) => {
   try {
     const text = req.query.text as string || 'Hello! This is a text to speech test using Google Cloud.';
     
-    const requestedVoice = req.query.voice as string || 'nova';
-    const gcpVoice = voiceMapping[requestedVoice] || 'en-US-Neural2-G';
     
     const audioDir = path.join(__dirname, '../../public/audio');
     if (!fs.existsSync(audioDir)) {
@@ -53,7 +35,6 @@ export const generateSpeech = async (req: Request, res: Response) => {
     const request: google.cloud.texttospeech.v1.ISynthesizeSpeechRequest = {
       input: { text },
       voice: {
-        name: gcpVoice,
         languageCode: 'en-US',
       },
       audioConfig: {
@@ -74,7 +55,6 @@ export const generateSpeech = async (req: Request, res: Response) => {
       success: true,
       message: 'Speech generated successfully',
       text,
-      voice: gcpVoice,
       audioUrl,
     });
   } catch (error) {
