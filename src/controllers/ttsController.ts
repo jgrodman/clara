@@ -1,58 +1,80 @@
 import { Request, Response } from 'express';
-import { OpenAI } from 'openai';
+import * as textToSpeech from '@google-cloud/text-to-speech';
 import fs from 'fs';
 import path from 'path';
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { google } from '@google-cloud/text-to-speech/build/protos/protos';
 
-// Define valid OpenAI TTS voices
-type OpenAIVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer' | 'ash' | 'coral' | 'sage';
+let client: textToSpeech.TextToSpeechClient;
 
-/**
- * Generate speech from text using OpenAI's text-to-speech API
- */
+if (process.env.GOOGLE_CLOUD_CREDENTIALS) {
+  try {
+    const credentials = JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS);
+    client = new textToSpeech.TextToSpeechClient({ credentials });
+  } catch (error) {
+    console.error('Error parsing Google Cloud credentials:', error);
+    client = new textToSpeech.TextToSpeechClient();
+  }
+} else {
+  client = new textToSpeech.TextToSpeechClient();
+}
+
+type GCPVoiceNames = 'en-US-Standard-A' | 'en-US-Standard-B' | 'en-US-Standard-C' | 'en-US-Standard-D' | 'en-US-Standard-E' | 
+                     'en-US-Standard-F' | 'en-US-Standard-G' | 'en-US-Standard-H' | 'en-US-Standard-I' | 'en-US-Standard-J' |
+                     'en-US-Neural2-A' | 'en-US-Neural2-C' | 'en-US-Neural2-D' | 'en-US-Neural2-E' | 'en-US-Neural2-F' | 
+                     'en-US-Neural2-G' | 'en-US-Neural2-H' | 'en-US-Neural2-I' | 'en-US-Neural2-J';
+
+const voiceMapping: Record<string, GCPVoiceNames> = {
+  'alloy': 'en-US-Neural2-A',
+  'echo': 'en-US-Neural2-C',
+  'fable': 'en-US-Neural2-F',
+  'onyx': 'en-US-Neural2-D',
+  'nova': 'en-US-Neural2-G',
+  'shimmer': 'en-US-Neural2-H',
+  'ash': 'en-US-Neural2-J',
+  'coral': 'en-US-Neural2-E',
+  'sage': 'en-US-Neural2-I'
+};
+
 export const generateSpeech = async (req: Request, res: Response) => {
   try {
-    // Get text from request or use default
-    const text = req.query.text as string || 'Hello! This is a text to speech test using OpenAI.';
+    const text = req.query.text as string || 'Hello! This is a text to speech test using Google Cloud.';
     
-    // Define voice options and validate input
     const requestedVoice = req.query.voice as string || 'nova';
-    const voice = (
-      ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer', 'ash', 'coral', 'sage'].includes(requestedVoice) 
-        ? requestedVoice 
-        : 'nova'
-    ) as OpenAIVoice;
+    const gcpVoice = voiceMapping[requestedVoice] || 'en-US-Neural2-G';
     
-    // Make sure the audio directory exists
     const audioDir = path.join(__dirname, '../../public/audio');
     if (!fs.existsSync(audioDir)) {
       fs.mkdirSync(audioDir, { recursive: true });
     }
     
-    // Generate unique filename
     const filename = `speech-${Date.now()}.mp3`;
     const audioPath = path.join(audioDir, filename);
     
-    // Call OpenAI API
-    const mp3 = await openai.audio.speech.create({
-      model: "tts-1",
-      voice: voice,
-      input: text,
-    });
+    const request: google.cloud.texttospeech.v1.ISynthesizeSpeechRequest = {
+      input: { text },
+      voice: {
+        name: gcpVoice,
+        languageCode: 'en-US',
+      },
+      audioConfig: {
+        audioEncoding: 'MP3',
+      },
+    };
     
-    // Convert to buffer and save to file
-    const buffer = Buffer.from(await mp3.arrayBuffer());
-    fs.writeFileSync(audioPath, buffer);
+    const [response] = await client.synthesizeSpeech(request);
     
-    // Send the audio file URL back to the client
+    if (response.audioContent) {
+      fs.writeFileSync(audioPath, response.audioContent as Buffer);
+    } else {
+      throw new Error('No audio content received from Google Cloud TTS');
+    }
+    
     const audioUrl = `/audio/${filename}`;
     res.json({
       success: true,
       message: 'Speech generated successfully',
       text,
-      voice,
+      voice: gcpVoice,
       audioUrl,
     });
   } catch (error) {
