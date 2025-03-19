@@ -24,7 +24,7 @@ export const generateSpeech = async (req: Request, res: Response) => {
     const text = req.query.text as string || 'Hello! This is a text to speech test using Google Cloud.';
     
     
-    const audioDir = path.join(__dirname, '../../public/audio');
+    const audioDir = path.join(__dirname, '../../artifacts/audio');
     if (!fs.existsSync(audioDir)) {
       fs.mkdirSync(audioDir, { recursive: true });
     }
@@ -50,12 +50,12 @@ export const generateSpeech = async (req: Request, res: Response) => {
       throw new Error('No audio content received from Google Cloud TTS');
     }
     
-    const audioUrl = `/audio/${filename}`;
+    const localAudioPath = audioPath;
     res.json({
       success: true,
       message: 'Speech generated successfully',
       text,
-      audioUrl,
+      audioUrl: localAudioPath,
     });
   } catch (error) {
     console.error('Error generating speech:', error);
