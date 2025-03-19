@@ -3,6 +3,9 @@ import * as textToSpeech from '@google-cloud/text-to-speech';
 import fs from 'fs';
 import path from 'path';
 import { google } from '@google-cloud/text-to-speech/build/protos/protos';
+import playSound from 'play-sound';
+
+const player = playSound({});
 
 let client: textToSpeech.TextToSpeechClient;
 
@@ -46,6 +49,14 @@ export const generateSpeech = async (req: Request, res: Response) => {
     
     if (response.audioContent) {
       fs.writeFileSync(audioPath, response.audioContent as Buffer);
+      
+      // Play the audio file on the local computer's speakers
+      player.play(audioPath, (err) => {
+        if (err) {
+          console.error('Error playing audio:', err);
+        }
+      });
+      
     } else {
       throw new Error('No audio content received from Google Cloud TTS');
     }
@@ -53,7 +64,7 @@ export const generateSpeech = async (req: Request, res: Response) => {
     const localAudioPath = audioPath;
     res.json({
       success: true,
-      message: 'Speech generated successfully',
+      message: 'Speech generated successfully and played on local speakers',
       text,
       audioUrl: localAudioPath,
     });
