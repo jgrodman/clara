@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as textToSpeech from '@google-cloud/text-to-speech';
+import * as tts from '@google-cloud/text-to-speech';
 import fs from 'fs';
 import path from 'path';
 import { google } from '@google-cloud/text-to-speech/build/protos/protos';
@@ -7,22 +7,22 @@ import playSound from 'play-sound';
 
 const player = playSound({});
 
-let client: textToSpeech.TextToSpeechClient;
+let client: tts.TextToSpeechClient;
 
 if (process.env.GOOGLE_CLOUD_CREDENTIALS) {
   try {
     const credentials = JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS);
-    client = new textToSpeech.TextToSpeechClient({ credentials });
+    client = new tts.TextToSpeechClient({ credentials });
   } catch (error) {
     console.error('Error parsing Google Cloud credentials:', error);
-    client = new textToSpeech.TextToSpeechClient();
+    client = new tts.TextToSpeechClient();
   }
 } else {
-  client = new textToSpeech.TextToSpeechClient();
+  client = new tts.TextToSpeechClient();
 }
 
 
-export const tts = async (text: string) => {
+export const textToSpeech = async (text: string) => {
   try {
     const audioDir = path.join(__dirname, '../../artifacts/audio-output');
     if (!fs.existsSync(audioDir)) {

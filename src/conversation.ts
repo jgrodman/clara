@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Airtable from 'airtable';
-import { tts } from './textToSpeech';
+import { textToSpeech } from './textToSpeech';
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -13,7 +13,8 @@ import { speechToText } from './speechToText';
 export const startConversation = async (req: Request, res: Response) => {
     try {
         const initialText = "Hello, I am hal";
-        await tts(initialText);
+        res.send("Initiating conversation")
+        await textToSpeech(initialText);
 
         const audioDir = path.join(process.cwd(), 'artifacts/audio-input');
         if (!fs.existsSync(audioDir)) {
