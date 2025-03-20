@@ -22,7 +22,7 @@ if (process.env.GOOGLE_CLOUD_CREDENTIALS) {
 }
 
 
-export const generateSpeech = async (text: string) => {
+export const tts = async (text: string) => {
   try {
     const audioDir = path.join(__dirname, '../../artifacts/audio-output');
     if (!fs.existsSync(audioDir)) {
@@ -42,7 +42,6 @@ export const generateSpeech = async (text: string) => {
       },
     };
 
-    console.log('Request:', request);
     const [response] = await client.synthesizeSpeech(request);
 
     if (response.audioContent) {
