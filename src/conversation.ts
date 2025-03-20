@@ -43,7 +43,6 @@ export const startConversation = async (req: Request, res: Response) => {
         const file = fs.createWriteStream(filePath);
         micStream.pipe(file);
 
-        debugger
         await new Promise(resolve => setTimeout(resolve, 5000));
         console.log('Stopping recording');
         mic.stopRecording();

@@ -49,10 +49,15 @@ export const generateSpeech = async (text: string) => {
       fs.writeFileSync(audioPath, response.audioContent as Buffer);
 
       // Play the audio file on the local computer's speakers
-      player.play(audioPath, (err) => {
-        if (err) {
-          console.error('Error playing audio:', err);
-        }
+      await new Promise<void>((resolve, reject) => {
+        player.play(audioPath, (err) => {
+          if (err) {
+            console.error('Error playing audio:', err);
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
       });
 
     } else {
