@@ -21,7 +21,12 @@ A Node.js Express application with TypeScript that provides a RESTful API.
    npm install
    ```
 
-3. Set up Google Cloud Text-to-Speech:
+3. Install sox
+   ```
+   brew install sox
+   ```
+
+4. Set up Google Cloud Text-to-Speech:
    - Create a project in the [Google Cloud Console](https://console.cloud.google.com/)
    - Enable the Text-to-Speech API for your project
    - Create a service account and download the JSON key file

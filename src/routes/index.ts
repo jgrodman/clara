@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import ttsRoutes from './ttsRoutes';
+import { startConversation } from '../conversation';
 
 const router = express.Router();
 
@@ -11,6 +11,6 @@ router.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'OK', message: 'Server is healthy' });
 });
 
-router.use('/tts', ttsRoutes);
+router.get('/hello', startConversation);
 
-export default router; 
+export default router;
