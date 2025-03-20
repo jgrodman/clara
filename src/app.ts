@@ -4,8 +4,7 @@ dotenv.config();
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-
-import routes from './routes';
+import { startConversation } from './conversation';
 
 // Initialize express app
 const app = express();
@@ -16,7 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
-app.use('/api', routes);
+app.get('/api/health', (req: Request, res: Response) => {
+  res.json({ status: 'OK', message: 'Server is healthy' });
+});
+
+app.get('/api/hello', startConversation);
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to the Express API. Use /api for API endpoints.' });
