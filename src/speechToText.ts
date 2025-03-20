@@ -21,37 +21,27 @@ export async function speechToText() {
     console.log('Stopping recording');
     mic.stopRecording();
 
-    try {
-        const audioBytes = fs.readFileSync(filePath).toString('base64');
+    const audioBytes = fs.readFileSync(filePath).toString('base64');
 
-        const request: speech.protos.google.cloud.speech.v1.IRecognizeRequest = {
-            audio: {
-                content: audioBytes
-            },
-            config: {
-                encoding: speech.protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding.LINEAR16,
-                sampleRateHertz: 16000,
-                languageCode: 'en-US'
-            }
-        };
-
-        const [response] = await speechClient.recognize(request);
-        let transcription = '';
-
-        if (response.results && response.results.length > 0) {
-            transcription = response.results
-                .map(result => result.alternatives && result.alternatives[0].transcript || '')
-                .join('\n');
+    const request: speech.protos.google.cloud.speech.v1.IRecognizeRequest = {
+        audio: {
+            content: audioBytes
+        },
+        config: {
+            encoding: speech.protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding.LINEAR16,
+            sampleRateHertz: 16000,
+            languageCode: 'en-US'
         }
+    };
 
-        console.log(`Transcript: ${transcription}`);
+    const [response] = await speechClient.recognize(request);
+    let transcription = '';
 
-        // const record = await base('Conversations').create({
-        //     'User Input': transcription || 'No speech detected',
-        //     'Timestamp': new Date().toISOString()
-        // });
-
-    } catch (error) {
-        console.error('Error in speech-to-text:', error);
+    if (response.results && response.results.length > 0) {
+        transcription = response.results
+            .map(result => result.alternatives && result.alternatives[0].transcript || '')
+            .join('\n');
     }
+
+    return transcription;
 }
