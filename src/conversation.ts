@@ -25,8 +25,7 @@ export const startConversation = async (req: Request, res: Response) => {
             hasMoreRequests = await handleRequest();
         }
         await textToSpeech("Thank you for your request. Have a great day!")
-        const airtableLink = `https://airtable.com/appMnJElGa31162oW/${tableId}`
-        console.log("Airtable link:", airtableLink)
+        console.log(`Share link: https://airtable.com/appMnJElGa31162oW/shrV7EDE6qrAqgelD/${tableId}`)
     } catch (error) {
         console.error(error)
     }
