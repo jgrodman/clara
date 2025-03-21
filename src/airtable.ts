@@ -15,7 +15,7 @@ export async function createTable() {
         'Content-Type': 'application/json'
     }
     const tableName = `conversation-${uuidv4()}`
-    await axios.post(`https://api.airtable.com/v0/meta/bases/${baseId}/tables`, JSON.stringify({
+    const res = await axios.post(`https://api.airtable.com/v0/meta/bases/${baseId}/tables`, JSON.stringify({
         description: 'Conversation transcript',
         fields: [
             {
@@ -33,7 +33,7 @@ export async function createTable() {
         ],
         name: tableName
     }), { headers });
-    return tableName
+    return { tableName, tableId: res.data.id }
 }
 
 export async function insertData(args: { tableName: string, fields: { [fieldName: string]: string } }) {

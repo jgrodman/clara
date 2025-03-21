@@ -17,7 +17,7 @@ export const startConversation = async (req: Request, res: Response) => {
     res.send("Initiating conversation")
     let tableName = ""
     try {
-        tableName = await createTable()
+        const { tableName, tableId } = await createTable()
         await initial()
         await getContact()
         let hasMoreRequests = true;
@@ -25,6 +25,8 @@ export const startConversation = async (req: Request, res: Response) => {
             hasMoreRequests = await handleRequest();
         }
         await textToSpeech("Thank you for your request. Have a great day!")
+        const airtableLink = `https://airtable.com/appMnJElGa31162oW/${tableId}`
+        console.log("Airtable link:", airtableLink)
     } catch (error) {
         console.error(error)
     }
