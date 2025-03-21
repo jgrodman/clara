@@ -5,9 +5,6 @@ import path from 'path';
 import { speechToText } from './speechToText';
 import { createTable, insertData, userRequestField, nameField, phoneNumberField } from './airtable';
 
-// type State = 'initial' | 'getContact' | 'request' | 'conclude'
-// const state: State = 'initial'
-
 const audioDir = path.join(process.cwd(), 'artifacts/audio-input');
 if (!fs.existsSync(audioDir)) {
     fs.mkdirSync(audioDir, { recursive: true });
@@ -30,15 +27,8 @@ export const startConversation = async (req: Request, res: Response) => {
         console.error(error)
     }
 
-
-
-
-
-
-
-
     async function initial() {
-        await textToSpeech("Hello, I am hal. Please state your request");
+        await textToSpeech("Hello, I am Hal. Please note that all conversations are recorded in a public airtable. Please state your request");
         const text = await speechToText();
         await insertData({ tableName, fields: { [userRequestField]: text } })
     }
