@@ -18,7 +18,7 @@ export async function speechToText() {
     const micStream = mic.startRecording();
     const file = fs.createWriteStream(filePath);
     micStream.pipe(file);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 5000));
     mic.stopRecording();
 
     const audioBytes = fs.readFileSync(filePath).toString('base64');

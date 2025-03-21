@@ -31,7 +31,8 @@ export const startConversation = async (req: Request, res: Response) => {
     }
 
     async function initial() {
-        await textToSpeech("Hello, I am Hal. Please note that all conversations are recorded in a public airtable. Please state your request");
+        await textToSpeech("Hello, I am Hal. Please note that all conversations are recorded in a public airtable. All inputs will be recorded for 5 seconds");
+        await textToSpeech("Please state your request");
         const text = await speechToText();
         await insertData({ tableName, fields: { [userRequestField]: text } })
     }
