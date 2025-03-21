@@ -18,7 +18,6 @@ export async function speechToText() {
     const file = fs.createWriteStream(filePath);
     micStream.pipe(file);
     await new Promise(resolve => setTimeout(resolve, 5000));
-    console.log('Stopping recording');
     mic.stopRecording();
 
     const audioBytes = fs.readFileSync(filePath).toString('base64');
@@ -42,6 +41,7 @@ export async function speechToText() {
             .map(result => result.alternatives && result.alternatives[0].transcript || '')
             .join('\n');
     }
+    console.log("User input: ", transcription)
 
     return transcription;
 }

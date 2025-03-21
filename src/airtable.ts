@@ -4,7 +4,10 @@ import { v4 as uuidv4 } from 'uuid';
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY });
 const baseId = 'appMnJElGa31162oW'
 
-const userRequestField = 'User Request'
+export const userRequestField = 'User Request'
+export const nameField = 'Name'
+export const phoneNumberField = 'Phone Number'
+
 // limited docs with the js library, so creating the table directly via axios
 export async function createTable() {
     const headers = {
@@ -18,6 +21,14 @@ export async function createTable() {
             {
                 "name": userRequestField,
                 "type": "multilineText"
+            },
+            {
+                "name": nameField,
+                "type": "singleLineText"
+            },
+            {
+                "name": phoneNumberField,
+                "type": "singleLineText"
             }
         ],
         name: tableName
@@ -25,9 +36,9 @@ export async function createTable() {
     return tableName
 }
 
-export async function insertData(tableName: string, data: string) {
+export async function insertData(args: { tableName: string, fields: { [fieldName: string]: string } }) {
+    const { tableName, fields } = args
+
     const table = airtable.base(baseId).table(tableName);
-    await table.create({
-        [userRequestField]: data
-    });
+    await table.create(fields);
 }

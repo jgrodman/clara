@@ -23,6 +23,7 @@ if (process.env.GOOGLE_CLOUD_CREDENTIALS) {
 
 
 export const textToSpeech = async (text: string) => {
+  console.log("Agent: ", text)
   try {
     const audioDir = path.join(__dirname, '../../artifacts/audio-output');
     if (!fs.existsSync(audioDir)) {
