@@ -28,7 +28,7 @@ A Node.js Express application with TypeScript that provides a RESTful API.
 
 4. copy gcloud_auth.json into the root of the project
 
-5. add the airtable API key to .env
+5. copy .env.example to .env and add the airtable API key
 
 ## Running the Application
 
