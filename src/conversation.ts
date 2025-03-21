@@ -20,6 +20,11 @@ export const startConversation = async (req: Request, res: Response) => {
         tableName = await createTable()
         await initial()
         await getContact()
+        let hasMoreRequests = true;
+        while (hasMoreRequests) {
+            hasMoreRequests = await handleRequest();
+        }
+        await textToSpeech("Thank you for your request. Have a great day!")
     } catch (error) {
         console.error(error)
     }
@@ -53,5 +58,18 @@ export const startConversation = async (req: Request, res: Response) => {
             }
         }
         await insertData({ tableName, fields: { [nameField]: name, [phoneNumberField]: phoneNumber } })
+        await textToSpeech("Your contact information has been saved")
+    }
+
+    async function handleRequest() {
+        await textToSpeech("Please state your request")
+        const text = await speechToText()
+        await insertData({ tableName, fields: { [userRequestField]: text } })
+        await textToSpeech("Do you have any other requests? Say yes if you do, or no if you don't")
+        const confirmText = await speechToText()
+        if (confirmText.toLowerCase() === "yes") {
+            return true
+        }
+        return false
     }
 };
