@@ -3,6 +3,7 @@ import * as speech from '@google-cloud/speech';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import Microphone from 'node-microphone';
+import logger from './logger';
 
 const audioDir = path.join(process.cwd(), 'artifacts/audio-input');
 const speechClient = new speech.SpeechClient();
@@ -12,12 +13,12 @@ if (!fs.existsSync(audioDir)) {
 
 export async function speechToText() {
     const filePath = path.join(audioDir, `recording-${uuidv4()}.wav`);
-    console.log('Recording audio...');
+    logger.info('Recording audio...');
     const mic = new Microphone();
     const micStream = mic.startRecording();
     const file = fs.createWriteStream(filePath);
     micStream.pipe(file);
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     mic.stopRecording();
 
     const audioBytes = fs.readFileSync(filePath).toString('base64');
@@ -41,7 +42,7 @@ export async function speechToText() {
             .map(result => result.alternatives && result.alternatives[0].transcript || '')
             .join('\n');
     }
-    console.log("User input: ", transcription)
+    logger.info("User input: " + transcription);
 
     return transcription;
 }

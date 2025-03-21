@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { google } from '@google-cloud/text-to-speech/build/protos/protos';
 import playSound from 'play-sound';
+import logger from './logger';
 
 const player = playSound({});
 
@@ -14,16 +15,15 @@ if (process.env.GOOGLE_CLOUD_CREDENTIALS) {
     const credentials = JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS);
     client = new tts.TextToSpeechClient({ credentials });
   } catch (error) {
-    console.error('Error parsing Google Cloud credentials:', error);
+    logger.error('Error parsing Google Cloud credentials:', error);
     client = new tts.TextToSpeechClient();
   }
 } else {
   client = new tts.TextToSpeechClient();
 }
 
-
 export const textToSpeech = async (text: string) => {
-  console.log("Agent: ", text)
+  logger.info("Agent: " + text);
   try {
     const audioDir = path.join(__dirname, '../../artifacts/audio-output');
     if (!fs.existsSync(audioDir)) {
@@ -52,7 +52,7 @@ export const textToSpeech = async (text: string) => {
       await new Promise<void>((resolve, reject) => {
         player.play(audioPath, (err) => {
           if (err) {
-            console.error('Error playing audio:', err);
+            logger.error('Error playing audio:', err);
             reject(err);
           } else {
             resolve();
@@ -64,6 +64,6 @@ export const textToSpeech = async (text: string) => {
       throw new Error('No audio content received from Google Cloud TTS');
     }
   } catch (error) {
-    console.error('Error generating speech:', error);
+    logger.error('Error generating speech:', error);
   }
 }; 

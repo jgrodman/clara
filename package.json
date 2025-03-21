@@ -33,7 +33,8 @@
     "node-microphone": "^0.1.6",
     "node-record-lpcm16": "^1.0.1",
     "play-sound": "^1.1.6",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@types/airtable": "^0.10.0",

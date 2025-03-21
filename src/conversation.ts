@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { speechToText } from './speechToText';
 import { createTable, insertData, userRequestField, nameField, phoneNumberField } from './airtable';
+import logger from './logger';
 
 const audioDir = path.join(process.cwd(), 'artifacts/audio-input');
 if (!fs.existsSync(audioDir)) {
@@ -14,7 +15,9 @@ export const startConversation = async (req: Request, res: Response) => {
     res.send("Initiating conversation")
     let tableName = ""
     try {
-        const { tableName, tableId } = await createTable()
+        const result = await createTable();
+        tableName = result.tableName;
+        const tableId = result.tableId;
         await initial()
         await getContact()
         let hasMoreRequests = true;
@@ -22,9 +25,9 @@ export const startConversation = async (req: Request, res: Response) => {
             hasMoreRequests = await handleRequest();
         }
         await textToSpeech("Thank you for your request. Have a great day!")
-        console.log(`Share link: https://airtable.com/appMnJElGa31162oW/shrV7EDE6qrAqgelD/${tableId}`)
+        logger.info(`Share link: https://airtable.com/appMnJElGa31162oW/shrV7EDE6qrAqgelD/${tableId}`)
     } catch (error) {
-        console.error(error)
+        logger.error('Error in conversation:', error)
     }
 
     async function initial() {
